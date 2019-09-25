@@ -1,14 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const {Course} = require('../models');
+const {Course, User} = require('../models');
 const authenticateUser = require('./authentication');
 const { check, validationResult } = require('express-validator');
+
+const filterOut = {
+  include: [{
+    model: User,
+    attributes: {exclude: ['password', 'createdAt', 'updatedAt']}
+  }],
+  attributes: {exclude: ['createdAt', 'updatedAt']}
+};
 
 //Validations
 const titleValidator = check('title')
   .exists({checkNull:true, checkFalsy:true})
   .withMessage('Please provide a value for "title"');
-const descriptionValidator = check('lastName')
+const descriptionValidator = check('description')
   .exists({checkNull:true, checkFalsy:true})
   .withMessage('Please provide a value for "description"');
 const userIdValidator = check('userId')
@@ -18,13 +26,12 @@ const userIdValidator = check('userId')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  Course.findAll({
-    attributes: { exclude: ['createdAt', 'updatedAt'] }
-  })
+  Course.findAll(filterOut)
     .then(courses => {
         if (courses) {
           res.json(courses);
         } else {
+          console.log('Could not find courses.');
           const error = new Error('Could not find courses.');
           error.status = 400;
           next(error);
@@ -33,15 +40,15 @@ router.get('/', function(req, res, next) {
   });
 
 
-
+//Get the course by ID
 router.get('/:id', function (req, res, next) {
-    Course.findByPk(req.params.id).then((course) => {
+    Course.findByPk(req.params.id, filterOut).then((course) => {
       if(course){
         res.status(200).json(course).end();
       } else {
         const error = new Error('No course was found.');
         error.status = 404;
-        next(error);      
+        next(error);
       }
     }).catch(function(err){
       res.send(500);
@@ -66,15 +73,18 @@ router.post('/', [
     const errorMessages = errors.array().map(error=>error.msg);
 
     //Return the validation errors to the client.
+    // const error = new Error(errorMessages);
+    // error.status = 400;
+    // next(error);
     return res.status(400).json({errors:errorMessages});
   } else {
-    const courseData = {
-      title: req.body.title,
-      description: req.body.description,
-      userId: req.body.userId
-    }
-    Course.create(courseData).then(()=>{
-      res.location(`/api/courses/${Course.id}`);
+  const courseInfo = {
+    title: req.body.title,
+    description: req.body.description,
+    userId: req.body.userId
+  }
+    Course.create(courseInfo).then((course)=>{
+      res.location(`/api/courses/${course.id}`);
       res.status(201).end();
     }).catch(function(err){
       if(err.name === "SequelizeValidationError"){
@@ -108,7 +118,12 @@ router.put('/:id', [
     const errorMessages = errors.array().map(error=>error.msg);
 
     //Return the validation errors to the client.
-    return res.status(400).json({errors:errorMessages}); 
+    // const error = new Error(errorMessages);
+    // error.status = 400;
+    // next(error);
+    return res.status(400).json({errors:errorMessages});
+
+     
   } else {
     Course.findByPk(req.params.id).then((course) => {
         if (course) {

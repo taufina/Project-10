@@ -57,7 +57,7 @@ router.post('/', [
 
 
     //get user data from request body:
-    const userData = {
+    const userInfo = {
       emailAddress: req.body.emailAddress,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -65,7 +65,7 @@ router.post('/', [
     }
 
     //Create user with the user data provided.
-    User.create(userData).then(()=>{
+    User.create(userInfo).then(()=>{
       res.location('/');
       res.status(201).end();
     }).catch(function(err){

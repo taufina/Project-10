@@ -1,80 +1,58 @@
-import React, { Component } from 'react';
-import axios from 'axios';
-// import logo from './logo.svg';
-// import './App.css';
-// import axios from 'axios';
+import React from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch
+} from 'react-router-dom';
+import Header from './components/Header';
+import Courses from './components/Courses';
+import UserSignIn from './components/UserSignIn';
+import UserSignUp from './components/UserSignUp';
+import UserSignOut from './components/UserSignOut';
+import CreateCourse from './components/CreateCourse';
+import CourseDetail from './components/CourseDetail';
+import UpdateCourse from './components/UpdateCourse';
+import NotFound from './components/NotFound';
+import Forbidden from './components/Forbidden';
+import UnhandledError from './components/UnhandledError';
+
+import withContext from './Context';
+import PrivateRoute from './PrivateRoute';
+
+const HeaderWithContext = withContext(Header);
+const UserSignUpWithContext = withContext(UserSignUp);
+const UserSignInWithContext = withContext(UserSignIn);
+const UserSignOutWithContext = withContext(UserSignOut);
+const CreateCourseWithContext = withContext(CreateCourse);
+const UpdateCourseWithContext = withContext(UpdateCourse);
+const CoursesWithContext = withContext(Courses);
+const CourseDetailWithContext = withContext(CourseDetail);
 
 
-class App extends Component {
-  state = {
-    courses: []
-  }
+// This is the Main component that is used for routing/rendering of components.
 
-  componentWillMount(){
-    axios.get(`http://localhost:5000/api/courses`).then((response)=> {
-      this.setState({
-        courses:response.data
-      })
-    })
-  }
-  render() {
-    let courses = this.state.courses.map((course)=>{
-      return (
-        <div>
-          <h1>{courses.title}</h1>
-        </div>
-      );
-    });
-    return (
-      <div>
-        <h1>Courses</h1>
-      </div>
-    );
-   
-  }
-}
 
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
+const App = () => (
+  <Router>
+    <div>
+      <HeaderWithContext />
 
-// class App extends Component {
-//   constructor(){
-//     super();
-//     this.state = {
-//       courses : [],
-//     };
-//   }
+      <Switch>
+        <Route exact path="/" component={CoursesWithContext} />
+        <PrivateRoute path="/courses/create" component={CreateCourseWithContext} />
+        <PrivateRoute path="/courses/:id/update" component={UpdateCourseWithContext} />
+        <Route path="/courses/:id" component={CourseDetailWithContext} />
+        <Route path="/signin" component={UserSignInWithContext} />
+        <Route path="/signup" component={UserSignUpWithContext} />
+        <Route path="/signout" component={UserSignOutWithContext} />
 
-//   axios.get(`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${query}&per_page=24&format=json&nojsoncallback=1`)
-//   .then(response=>{
-//     console.log(response);
-//     this.setState({
-//       photos: response.data.photos.photo,
-//       loading: false
-//     });
-//   })
-//     .catch(error => {
-//       console.log('error fetching and parsing data', error);
-//     });
+        <Route path="/forbidden" component={Forbidden} />
+        <Route path="/error" component={UnhandledError} />
+        <Route component={NotFound} />
+      </Switch>
+    </div>
+  </Router>
+);
 
-// }
 
 export default App;

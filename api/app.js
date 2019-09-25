@@ -4,8 +4,11 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const sequelize = require('./models').sequelize;
 const cors = require('cors');
- 
+
+
+
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
 
@@ -18,8 +21,27 @@ const coursesRouter = require('./routes/courses');
 
 
 const app = express();  //create express app
-
 app.use(cors());
+
+
+
+(async () => {
+  try {
+    
+    // This will Test the connection to the database and log it to console//
+    await sequelize.authenticate();
+    console.log('Connection to the database was successful');
+
+    // Sync the models
+    await sequelize.sync();
+    console.log('Models are synchronized with the database');
+
+  }catch(err){
+    
+    console.log('Connection to the database was unsuccessful' + ' ' + err)
+
+  }
+})()
 
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
