@@ -36,10 +36,10 @@ class CourseDetail extends Component {
     const { context } = this.props;
     const { courseInfo } = this.state;
     const { emailAddress } = context.authenticatedUser;
-    const password = prompt('Please enter your password.');
+    // const password = prompt('Please enter your password.');
 
     //After deleting the course, go to homepage.
-    context.data.deleteCourse(courseInfo.id, emailAddress, password)
+    context.data.deleteCourse(courseInfo.id, emailAddress, context.userPassword)
       .then(() => {
         this.props.history.push('/')
       })

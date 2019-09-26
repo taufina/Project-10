@@ -46,9 +46,9 @@ class CreateCourse extends Component {
     };
   
 
-    const password = prompt('Please enter your password.');
+    // const password = prompt('Please enter your password.');
 
-    context.data.createCourse(course, emailAddress, password)
+    context.data.createCourse(course, emailAddress, context.userPassword)
       .then( errors => {
         if (errors.length) {
           this.setState({ errors });

@@ -84,9 +84,9 @@ class UpdateCourse extends Component {
     };
 
     const id = this.props.match.params.id;
-    const password = prompt('Please confirm password.');
+    // const password = prompt('Please confirm password.');
 
-    context.data.updateCourse(id, course, emailAddress, password)
+    context.data.updateCourse(id, course, emailAddress, context.userPassword)
       .then(errors => {
         if (errors.length) {
           this.setState({ errors });
@@ -101,7 +101,8 @@ class UpdateCourse extends Component {
   }
 
   cancel = () => {
-    this.props.history.push('/');
+    const id = this.props.match.params.id;
+    this.props.history.push(`/courses/${id}`);
   }
 
   render() {
